@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head('Register')">
+        
+    </head>
+    <body>
+        <div th:replace="fragments/layout :: navbar"></div>
+        
+        <section class="container">
+            <h1>Registering:</h1>
+        
+            <form action="#" th:action="@{/register}" th:object="${account}" method="POST">
+            <table>
+                <tr>
+                    <td>Name: </td>
+                    <td><input class="form-control" type="text" th:field="*{name}" /></td>
+                    <td th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name errors</td>
+                </tr>
+                <tr>
+                    <td>Username: </td>
+                    <td><input class="form-control" type="text" th:field="*{username}" /></td>
+                    <td th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username errors</td>
+                </tr>
+                <tr>
+                    <td>Profile: </td>
+                    <td><input class="form-control" type="text" th:field="*{profile}" /></td>
+                    <td th:if="${#fields.hasErrors('profile')}" th:errors="*{profile}">Profile Virheviesti</td>
+                </tr>
+                <tr>
+                    <td>Password: </td>
+                    <td><input class="form-control" type="password" th:field="*{password}" /></td>
+                    <td th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password errors</td>
+                </tr>
+                <tr>
+                    <td><button class="btn btn-success" type="submit">Submit</button></td>
+                </tr>
+            </table>
+        </form>
+            
+        </section>
+    </body>
+</html>

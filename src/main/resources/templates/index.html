@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="fragments/layout :: head('Etusivu')"></head>
+    <body>
+        <nav th:replace="fragments/layout :: navbar"></nav>
+        
+        <div class='container'>
+            <div th:if="${user != null}">
+                <h2><span th:text="'Welcome, ' + ${user.name} + '!'">Welcome!</span></h2>
+                <h3>Here are some useful links to sections of the website:</h3>
+                <ul>
+                    <li><a th:href="@{/wall/{profile}(profile=${user.profile})}">Your wall</a></li>
+                    <li><a th:href="@{/friendrequests}">Your friend requests</a></li>
+                    <li><a th:href="@{/search}">Search users</a></li>
+                </ul>
+            </div>
+        
+            <div th:unless="${user != null}">
+                <h2>You are currently not logged in.</h2>
+                <p>You need to <a th:href="@{/login}">Login</a> or <a th:href="@{/register}">Register</a> to continue.</p>           
+            </div>
+        </div>
+    </body>
+</html>

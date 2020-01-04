@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:replace="fragments/layout :: head('Wall')"></head>
+    <body>
+        <nav th:replace="fragments/layout :: navbar"></nav>
+        
+        <div class="container">
+            <div class="row">
+               <div class="col-sm-3">
+                    <h2>Friends with:</h2>
+                    <ul>
+                        <li th:each="friend : ${owner.friends}">
+                            <a th:href="@{/wall/{friendProfile}(friendProfile=${friend.profile})}" th:text="${friend.name}"></a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-sm-5">
+                    <h1>
+                        <div th:if="${owner.profilePicture != null}" class="img"><img width="200" height="200" th:src="@{/images/{id}/content(id=${owner.profilePicture.id})}" class="img-fluid" alt="Responsive image"></div>
+                        <span th:text="${owner.name}"></span>
+                    </h1>
+            
+            
+                    <div th:unless="${friend}">
+                        <form th:action="@{/friendrequest/{ownerId}(ownerId=${owner.id})}">
+                            <button type="submit" class="btn btn-success">Add as friend!</button>
+                        </form>
+                    </div>
+                
+                    <section>
+                        <form th:if="${#lists.contains(owner.friends, user) or user != null and owner.id == user.id}" class="form-vertical" th:action="@{/wall/{wallProfile}(wallProfile=${owner.profile})}" method="POST">
+                            <label class="control-label" for="name">Message</label>
+                            <div class="form-group">
+                                <textarea class="md-textarea form-control" rows="4" cols="40" name="message"></textarea> 
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post!</button>
+                        </form>
+                        
+                        <p th:unless="${#lists.contains(owner.friends, user) or user != null and owner.id == user.id}">Only friends can post on the wall.</p>
+                    </section>
+                    
+                    <hr>
+                    
+                    <ul>
+                        <li th:each="post : ${posts}">
+                            <section>
+                                
+                                <div class="container">
+                                    <h2>
+                                        <div style="display:inline;" th:if="${post.poster.profilePicture != null}" class="img"><img width="50" height="50" th:src="@{/images/{id}/content(id=${post.poster.profilePicture.id})}" class="img-fluid" alt="Responsive image"></div>
+                                        <div style="display:inline;"><a th:href="@{/wall/{posterProfile}(posterProfile=${post.poster.profile})}" th:text="${post.poster.name}"></a></div>                               
+                                    </h2>
+                                </div>
+                                <p th:text="'Posted: ' + ${#temporals.format(post.date, 'dd-MM-yyyy HH:mm')}"></p>
+                                <pre th:text="${post.message}"></pre>
+                                
+                                <span th:text="'Likes: ' + ${#lists.size(post.likedBy)}"></span>
+                                
+                                <div th:unless="${#lists.contains(post.likedBy, user)}">
+                                    <form th:action="@{/like/post/{postId}(postId=${post.id})}">
+                                        <button type="submit" class="btn btn-success">Like</button>
+                                    </form>
+                                </div>
+                                
+                                <div th:if="${#lists.contains(post.likedBy, user)}">
+                                    <form th:action="@{/unlike/post/{postId}(postId=${post.id})}">
+                                        <button type="submit" class="btn btn-danger">Unlike</button>
+                                    </form>
+                                </div>
+                                
+                                <ul>
+                                    <li th:each="comment, iterStat : ${post.comments}" th:if="${iterStat.index >= iterStat.size-10}">
+                                        <a th:href="@{/wall/{posterProfile}(posterProfile=${comment.poster.profile})}">
+                                            <span th:text="${comment.poster.name}"></span>
+                                        </a> <span>at </span>
+                                        <span th:text="${#temporals.format(comment.date, 'dd-MM-yyyy HH:mm')}">0:0</span>
+                                        <pre th:text="${comment.message}"></pre>
+                                    </li>
+                                </ul>
+                        
+                                <form class="form-vertical" th:action="@{/comment/{wallProfile}/{postId}(postId=${post.id}, wallProfile=${owner.profile})}" method="POST">
+                                    <label class="control-label" for="name">Comment</label>
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="message">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Comment</button>
+                                </form>
+                        
+                            </section>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-sm-4">
+                    <h2 th:text="'Album: (' + ${#lists.size(album)} + ' images)'">Album:</h2>
+                    
+                    <form th:if="${user != null && user.id == owner.id}" method="POST" th:action="@{/addImage}" enctype="multipart/form-data">
+                        <label>Add a new image: </label>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea class="md-textarea form-control" rows="4" name="description"></textarea> 
+                        </div>
+                        <input type="file" name="file" id="file"/>
+                        <input type="submit" value="Add!"/>
+                    </form>
+                    
+                    <hr>
+                    
+                    <ul>
+                        <section>
+                            <li th:each="image : ${album}">
+                                <pre th:text="${image.description}"></pre>
+                                <div class="img"><img th:src="@{/images/{id}/content(id=${image.id})}" class="img-fluid" alt="Responsive image"></div>
+                                <div th:if="${user != null && user.id == owner.id}" class="form-group">
+                                    <a class="btn btn-success" th:href="@{/setProfilePic/{imageId}(imageId=${image.id})}">
+                                        Set as profile picture
+                                    </a>
+                    
+                                    <a class="btn btn-danger" th:href="@{/deleteImage/{imageId}(imageId=${image.id})}">
+                                        Delete
+                                    </a>
+                                    
+                                </div>
+                                
+                                <span th:text="'Likes: ' + ${#lists.size(image.likedBy)}"></span>
+                                
+                                <div th:unless="${#lists.contains(image.likedBy, user)}">
+                                    <form th:action="@{/like/image/{imageId}(imageId=${image.id})}">
+                                        <button type="submit" class="btn btn-success">Like</button>
+                                    </form>
+                                </div>
+                                
+                                <div th:if="${#lists.contains(image.likedBy, user)}">
+                                    <form th:action="@{/unlike/image/{imageId}(imageId=${image.id})}">
+                                        <button type="submit" class="btn btn-danger">Unlike</button>
+                                    </form>
+                                </div>
+                                
+                                <ul>
+                                    <li th:each="comment : ${image.comments}">
+                                        <a th:href="@{/wall/{posterProfile}(posterProfile=${comment.poster.profile})}">
+                                            <span th:text="${comment.poster.name}"></span>
+                                        </a> <span>at </span>
+                                        <span th:text="${#temporals.format(comment.date, 'dd-MM-yyyy HH:mm')}">0:0</span>
+                                        <pre th:text="${comment.message}"></pre>
+                                    </li>
+                                </ul>
+                        
+                                <form class="form-vertical" th:action="@{/commentImage/{wallProfile}/{imageId}(imageId=${image.id}, wallProfile=${owner.profile})}" method="POST">
+                                    <label class="control-label" for="name">Comment</label>
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" name="message">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Comment</button>
+                                </form>
+                            </li>
+                        </section>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head th:fragment="head(title)">
+        <title th:text="${title} + ' | Lärvipamfletti'">TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    </head>
+    
+    <body>
+        <nav th:fragment="navbar" class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <a class="navbar-brand" th:href="@{/}">Lärvipamfletti</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/search}">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/friendrequests}">Your friend requests</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:if="${user} != null" class="nav-link" th:href="@{/wall/{profile}(profile=${user.profile})}"><span th:text="${user.name}">Bob</span></a>
+                        <a th:unless="${user} != null" class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a th:if="${user} != null" class="btn btn-danger" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div> 
+        </nav>
+        
+        <div>TODO write content</div>
+    </body>
+</html>
